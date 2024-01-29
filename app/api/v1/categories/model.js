@@ -7,10 +7,10 @@ let categorySchema = Schema(
       type: String,
       minLength: [3, "Panjang nama kategori minimal 3 karakter"],
       maxLength: [20, "Panjang nama kategori maksimal 20 karakter"],
-      require: [true, "Nama kategori harus diisi"],
+      required: [true, "Nama kategori harus diisi"],
     },
   },
   { timestamps: true }
 );
 
-module.exports = model("category", categorySchema);
+module.exports = model("Category", categorySchema);
