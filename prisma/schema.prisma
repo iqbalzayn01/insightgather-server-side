@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum RoleUser {
+  superadmin
+  participant
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(100)
+  email    String   @unique @db.VarChar(100)
+  password String   @db.VarChar(255)
+  no_telp  String   @unique @db.VarChar(14)
+  avatar   String?
+  role     RoleUser @default(participant)
+
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  Order            Order[]
+  UserRefreshToken UserRefreshToken[]
+}
+
+model UserRefreshToken {
+  refreshToken String @id @unique
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+enum EventStatus {
+  open
+  close
+  finish
+}
+
+model Event {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar(100)
+  description String      @db.VarChar(255)
+  status      EventStatus @default(open)
+  location    String      @db.VarChar(100)
+  price       BigInt      @db.BigInt
+  linkMeeting String?
+  images      String[]
+  kuota       Int         @default(0)
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  OrderItem OrderItem[]
+}
+
+enum OrderStatus {
+  pending
+  success
+  failed
+}
+
+model Order {
+  id     Int         @id @default(autoincrement())
+  code   String      @unique @db.Text
+  status OrderStatus @default(pending)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  OrderItem OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id Int @id @default(autoincrement())
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
+  eventId Int
+  event   Event @relation(fields: [eventId], references: [id])
+
+  subtotal BigInt @db.BigInt
+  quantity Int    @default(1) @db.Integer
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
