@@ -6,6 +6,48 @@ const {
 } = require('../errors');
 const { createTokenUser, createJWT, createRefreshJWT } = require('../utils');
 const { createUserRefreshToken } = require('./userRefreshToken');
+const bcrypt = require('bcryptjs');
+
+const register = async (req) => {
+  const { name, email, password, confirmPassword, phoneNumber, role } =
+    req.body;
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email: email,
+      phoneNumber: phoneNumber,
+    },
+  });
+
+  if (existingUser.email) {
+    throw new BadRequestError('This email address is already in use');
+  }
+
+  if (existingUser.phoneNumber) {
+    throw new BadRequestError('This phone number is already in use');
+  }
+
+  if (password !== confirmPassword) {
+    throw new BadRequestError(
+      'Password and confirmation password do not match. Please try again.'
+    );
+  }
+
+  const hashPassword = await bcrypt.hash(password, 20);
+
+  const result = await prisma.user.create({
+    data: {
+      email: email,
+      name: name,
+      password: hashPassword,
+      phoneNumber: phoneNumber,
+      role: 'participant',
+    },
+  });
+
+  delete result._doc.passowrd;
+
+  return result;
+};
 
 const login = async (req) => {
   const { email, passowrd } = req.body;
@@ -14,7 +56,7 @@ const login = async (req) => {
     throw new BadRequestError('Please provide email and password');
   }
 
-  const result = await prisma.user.findFirst({
+  const result = await prisma.user.findUnique({
     where: {
       email: email,
     },
@@ -24,9 +66,9 @@ const login = async (req) => {
     throw new UnauthorizedError('Invalid Credentials');
   }
 
-  const isPasswordCorrect = await result.comparePassword(passowrd);
+  const comparePassword = await bcrypt.compare(passowrd, result.password);
 
-  if (!isPasswordCorrect) {
+  if (!comparePassword) {
     throw new UnauthenticatedError('Invalid Credentials');
   }
 
@@ -65,6 +107,7 @@ const getUserLogged = async (req, res, next) => {
 };
 
 module.exports = {
+  register,
   login,
   getUserLogged,
 };

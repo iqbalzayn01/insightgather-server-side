@@ -20,13 +20,13 @@ enum RoleUser {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  name     String   @db.VarChar(100)
-  email    String   @unique @db.VarChar(100)
-  password String   @db.VarChar(255)
-  no_telp  String   @unique @db.VarChar(14)
-  avatar   String?
-  role     RoleUser @default(participant)
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  email       String   @unique @db.VarChar(100)
+  password    String   @db.VarChar(255)
+  phoneNumber String   @unique @db.VarChar(14)
+  avatar      String?
+  role        RoleUser @default(participant)
 
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
