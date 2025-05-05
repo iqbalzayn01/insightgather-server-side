@@ -1,13 +1,12 @@
 const { register, login, getUserLogged } = require('../../../services/auth');
 const { status } = require('http-status');
-const { createTokenUser } = require('../../../utils');
 
 const create = async (req, res, next) => {
   try {
     const result = await register(req);
 
     res.status(status.CREATED).json({
-      result,
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -19,7 +18,7 @@ const loginCms = async (req, res, next) => {
     const result = await login(req);
 
     res.status(status.CREATED).json({
-      result,
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -31,7 +30,7 @@ const userLogged = async (req, res, next) => {
     const result = await getUserLogged(req);
 
     res.status(status.OK).json({
-      result,
+      data: result,
     });
   } catch (error) {
     next(error);

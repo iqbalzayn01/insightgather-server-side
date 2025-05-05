@@ -7,13 +7,18 @@ const {
 const { NotFoundError } = require('../errors');
 
 const createUserRefreshToken = async (payload) => {
-  const result = await prisma.userRefreshToken.create(payload);
+  const result = await prisma.refreshToken.create({
+    data: {
+      refreshToken: payload.refreshToken,
+      userId: payload.userId,
+    },
+  });
   return result;
 };
 
 const getUserRefreshToken = async (req) => {
   const { refreshToken } = req.params;
-  const result = await prisma.userRefreshToken.findFirst({
+  const result = await prisma.refreshToken.findFirst({
     where: {
       refreshToken: refreshToken,
     },

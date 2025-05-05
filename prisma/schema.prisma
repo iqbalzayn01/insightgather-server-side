@@ -28,20 +28,20 @@ model User {
   avatar      String?
   role        RoleUser @default(participant)
 
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  Order            Order[]
-  UserRefreshToken UserRefreshToken[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Order        Order[]
+  RefreshToken RefreshToken[]
 }
 
-model UserRefreshToken {
-  refreshToken String @id @unique
+model RefreshToken {
+  id           Int    @id @default(autoincrement())
+  refreshToken String
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
-  expiresAt DateTime
 }
 
 enum EventStatus {

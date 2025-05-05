@@ -13,17 +13,12 @@ const register = async (req) => {
     req.body;
   const existingUser = await prisma.user.findUnique({
     where: {
-      email: email,
-      phoneNumber: phoneNumber,
+      email,
     },
   });
 
-  if (existingUser.email) {
+  if (existingUser) {
     throw new BadRequestError('This email address is already in use');
-  }
-
-  if (existingUser.phoneNumber) {
-    throw new BadRequestError('This phone number is already in use');
   }
 
   if (password !== confirmPassword) {
@@ -32,33 +27,41 @@ const register = async (req) => {
     );
   }
 
-  const hashPassword = await bcrypt.hash(password, 20);
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  console.log('TEST: ', {
+    name,
+    email,
+    password: hashedPassword,
+    phoneNumber,
+    role,
+  });
 
   const result = await prisma.user.create({
     data: {
-      email: email,
-      name: name,
-      password: hashPassword,
-      phoneNumber: phoneNumber,
-      role: 'participant',
+      name,
+      email,
+      password: hashedPassword,
+      phoneNumber,
+      role,
     },
   });
 
-  delete result._doc.passowrd;
+  const { password: _, ...safeUser } = result;
 
-  return result;
+  return safeUser;
 };
 
 const login = async (req) => {
-  const { email, passowrd } = req.body;
+  const { email, password } = req.body;
 
-  if (!email || !passowrd) {
+  if (!email || !password) {
     throw new BadRequestError('Please provide email and password');
   }
 
   const result = await prisma.user.findUnique({
     where: {
-      email: email,
+      email,
     },
   });
 
@@ -66,7 +69,7 @@ const login = async (req) => {
     throw new UnauthorizedError('Invalid Credentials');
   }
 
-  const comparePassword = await bcrypt.compare(passowrd, result.password);
+  const comparePassword = await bcrypt.compare(password, result.password);
 
   if (!comparePassword) {
     throw new UnauthenticatedError('Invalid Credentials');
@@ -78,7 +81,7 @@ const login = async (req) => {
   const refreshToken = createRefreshJWT({ payload: tokenPayload });
 
   if (role === 'superadmin' || role === 'participant') {
-    await createUserRefreshToken({ refreshToken, user: result.id });
+    await createUserRefreshToken({ refreshToken, userId: result.id });
   }
 
   return {
