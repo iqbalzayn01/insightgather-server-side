@@ -15,7 +15,9 @@ const getAllUsers = async () => {
     },
   });
 
-  return result;
+  if (!result || result.length === 0) {
+    throw new NotFoundError('There is no data available.');
+  }
 };
 
 const getOneUser = async (req) => {

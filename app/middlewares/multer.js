@@ -6,12 +6,19 @@ const path = require('path');
 const storage = multer.memoryStorage();
 
 // filter images
-const imageFileFilter = (req, file, cb) => {
+const imageFileFilter = (_req, file, cb) => {
+  if (!file.originalname || !file.mimetype) {
+    const error = new Error('Invalid file format.');
+    error.statusCode = status.UNSUPPORTED_MEDIA_TYPE;
+    return cb(error, false);
+  }
+
   const allowedTypes = /jpeg|jpg|png/;
+
   const extname = allowedTypes.test(
     path.extname(file.originalname).toLowerCase()
   );
-  const mimetype = allowedTypes.test(file.mimt);
+  const mimetype = allowedTypes.test(file.mimetype);
 
   if (extname && mimetype) {
     cb(null, true);

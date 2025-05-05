@@ -11,6 +11,7 @@ const v1 = '/api/v1';
 const authRouter = require('./app/api/v1/auth/router');
 const userRefreshTokenRouter = require('./app/api/v1/userRefreshToken/router');
 const usersRouter = require('./app/api/v1/users/router');
+const eventsRouter = require('./app/api/v1/events/router');
 
 // middlewares
 const notFoundMiddleware = require('./app/middlewares/not-found');
@@ -36,6 +37,7 @@ app.get('/', (req, res) => res.send('Welcome to API InsightGathers'));
 app.use(`${v1}`, authRouter);
 app.use(`${v1}`, userRefreshTokenRouter);
 app.use(`${v1}`, usersRouter);
+app.use(`${v1}`, eventsRouter);
 
 // app middlewares
 app.use(notFoundMiddleware);
