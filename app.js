@@ -10,6 +10,7 @@ const v1 = '/api/v1';
 // router
 const authRouter = require('./app/api/v1/auth/router');
 const userRefreshTokenRouter = require('./app/api/v1/userRefreshToken/router');
+const usersRouter = require('./app/api/v1/users/router');
 
 // middlewares
 const notFoundMiddleware = require('./app/middlewares/not-found');
@@ -27,12 +28,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 //   });
 // });
 
-app.get('/', (req, res) => res.send('Welcome to API UpSkills'));
-app.listen(3000, () => console.log('Server ready on port 3000.'));
+// app.listen(3000, () => console.log('Server ready on port 3000.'));
+
+app.get('/', (req, res) => res.send('Welcome to API InsightGathers'));
 
 // app router
-app.use(`${v1}/cms`, authRouter);
-app.use(`${v1}/cms`, userRefreshTokenRouter);
+app.use(`${v1}`, authRouter);
+app.use(`${v1}`, userRefreshTokenRouter);
+app.use(`${v1}`, usersRouter);
 
 // app middlewares
 app.use(notFoundMiddleware);
