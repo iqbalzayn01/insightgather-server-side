@@ -29,14 +29,12 @@ const createOrder = async (req) => {
       status,
       userId: Number(userId),
     },
-    include: { OrderItem: true },
   });
 
   return result;
 };
 
 const getAllOrders = async () => {
-  console.log('TEST:');
   const result = await prisma.order.findMany({
     orderBy: {
       createdAt: 'desc',
@@ -45,20 +43,48 @@ const getAllOrders = async () => {
       id: true,
       code: true,
       status: true,
-      userId: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      OrderItem: {
+        select: {
+          id: true,
+          orderId: true,
+          quantity: true,
+          subtotal: true,
+          event: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+            },
+          },
+        },
+      },
       createdAt: true,
     },
-    // include: {
-    //   user: true,
-    //   OrderItem: true,
-    // },
   });
 
   if (!result || result.length === 0) {
     throw new NotFoundError('There is no data available.');
   }
 
-  return result;
+  const formattedResult = result.map((order) => ({
+    ...order,
+    OrderItem: order.OrderItem.map((item) => ({
+      ...item,
+      subtotal: Number(item.subtotal),
+    })),
+  }));
+
+  return formattedResult;
+};
+
+const getOneOrder = async (req) => {
+  const { id } = req.params;
 };
 
 const checkingOrders = async (id) => {
