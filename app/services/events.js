@@ -111,6 +111,7 @@ const getOneEvent = async (req) => {
 const updateEvent = async (req) => {
   const { id } = req.params;
   const { name, description, status, location, price, quota } = req.body;
+  const file = req.file;
 
   const existing = await prisma.event.findUnique({
     where: {
@@ -124,13 +125,13 @@ const updateEvent = async (req) => {
 
   let updateImage = existing.images;
 
-  if (req.file) {
+  if (file) {
     const oldImage = existing.images?.[0];
     if (oldImage) {
       await deleteFile(oldImage, 'events');
     }
 
-    const filename = await uploadFile(req.file, 'events');
+    const filename = await uploadFile(file, 'events');
     updateImage = [filename];
   }
 

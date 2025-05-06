@@ -18,6 +18,7 @@ router.get('/events', authenticateUser, authorizeRoles('superadmin'), index);
 router.get('/events/:id', authenticateUser, authorizeRoles('superadmin'), find);
 router.put(
   '/events/:id',
+  upload.single('images'),
   authenticateUser,
   authorizeRoles('superadmin'),
   update
