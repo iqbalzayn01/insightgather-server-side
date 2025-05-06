@@ -22,12 +22,17 @@ const uploadFile = async (file, path) => {
   const fileType = file.mimetype.split('/')[1];
   const filename = `${path}-${Date.now()}.${fileType}`;
 
-  await supabase.storage
+  const { error } = await supabase.storage
     .from('insightgathers-bucket')
-    .upload(`public/images/${path}/${filename}`, file, {
+    .upload(`public/images/${path}/${filename}`, file.buffer, {
       cacheControl: '3600',
       upsert: false,
+      contentType: file.mimetype,
     });
+
+  if (error) {
+    throw new Error(`Upload failed: ${error.message}`);
+  }
 
   return filename;
 };
@@ -43,32 +48,3 @@ module.exports = {
   uploadFile,
   deleteFile,
 };
-
-// const uploadToSupabase = async (fileBuffer, filename, mimetype) => {
-//   const { data, error } = await supabase.storage
-//     .from('insightgathers-bucket')
-//     .upload(filename, fileBuffer, {
-//       contentType: mimetype,
-//       upsert: true,
-//     });
-
-//   if (error) {
-//     throw new Error(`Upload failed: ${error.message}`);
-//   }
-
-//   const { data: publicUrlData } = supabase.storage
-//     .from('insightgathers-bucket')
-//     .getPublicUrl(filename);
-
-//   return publicUrlData.publicUrl;
-// };
-
-// const deleteFile = async (filename) => {
-//   const { error } = await supabase.storage
-//     .from('insightgathers-bucket')
-//     .remove([filename]);
-
-//   if (error) {
-//     throw new Error(`Failed to delete file: ${error.message}`);
-//   }
-// };

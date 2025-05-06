@@ -2,6 +2,7 @@ const {
   createEvents,
   getAllEvents,
   getOneEvent,
+  updateEvent,
   deleteEvent,
 } = require('../../../services/events');
 const { status } = require('http-status');
@@ -42,6 +43,18 @@ const find = async (req, res, next) => {
   }
 };
 
+const update = async (req, res, next) => {
+  try {
+    const result = await updateEvent(req);
+
+    res.status(status.OK).json({
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const destroy = async (req, res, next) => {
   try {
     const result = await deleteEvent(req);
@@ -58,5 +71,6 @@ module.exports = {
   create,
   index,
   find,
+  update,
   destroy,
 };

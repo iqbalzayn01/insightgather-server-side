@@ -1,4 +1,3 @@
-const res = require('express/lib/response');
 const prisma = require('../config/prisma');
 const { uploadFile, deleteFile } = require('../config/supabase');
 const { BadRequestError, NotFoundError } = require('../errors');
@@ -120,8 +119,60 @@ const updateEvent = async (req) => {
   });
 
   if (!existing) {
-    throw new NotFoundError(`User with id ${id} not found`);
+    throw new NotFoundError(`Event with id: ${id} not found`);
   }
+
+  let updateImage = existing.images;
+
+  if (req.file) {
+    const oldImage = existing.images?.[0];
+    if (oldImage) {
+      await deleteFile(oldImage, 'events');
+    }
+
+    const filename = await uploadFile(req.file, 'events');
+    updateImage = [filename];
+  }
+
+  const data = {
+    name,
+    description,
+    status,
+    location,
+    price: price !== undefined ? BigInt(price) : undefined,
+    images: req.file ? updateImage : undefined,
+    quota: quota !== undefined ? parseInt(quota) : undefined,
+  };
+
+  // filter out undefined values
+  Object.keys(data).forEach(
+    (key) => data[key] === undefined && delete data[key]
+  );
+
+  const result = await prisma.event.update({
+    where: {
+      id: Number(id),
+    },
+    data,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      status: true,
+      location: true,
+      price: true,
+      images: true,
+      quota: true,
+    },
+  });
+
+  const formattedResult = {
+    ...result,
+    price: Number(result.price),
+    quota: Number(result.quota),
+  };
+
+  return formattedResult;
 };
 
 const deleteEvent = async (req) => {
@@ -136,7 +187,7 @@ const deleteEvent = async (req) => {
   });
 
   if (!existing) {
-    throw new NotFoundError(`User with id ${id} not found`);
+    throw new NotFoundError(`Event with id ${id} not found`);
   }
 
   await deleteFile(existing.images[0], 'events');
@@ -147,12 +198,13 @@ const deleteEvent = async (req) => {
     },
   });
 
-  return { msg: `User with Id ${id} deleted successfully` };
+  return { msg: `Event with Id ${id} deleted successfully` };
 };
 
 module.exports = {
   createEvents,
   getAllEvents,
   getOneEvent,
+  updateEvent,
   deleteEvent,
 };

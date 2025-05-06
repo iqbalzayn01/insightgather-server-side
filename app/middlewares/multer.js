@@ -7,14 +7,13 @@ const storage = multer.memoryStorage();
 
 // filter images
 const imageFileFilter = (_req, file, cb) => {
-  if (!file.originalname || !file.mimetype) {
-    const error = new Error('Invalid file format.');
-    error.statusCode = status.UNSUPPORTED_MEDIA_TYPE;
-    return cb(error, false);
-  }
+  // if (!file.originalname || !file.mimetype) {
+  //   const error = new Error('Invalid file format.');
+  //   error.statusCode = status.UNSUPPORTED_MEDIA_TYPE;
+  //   return cb(error, false);
+  // }
 
   const allowedTypes = /jpeg|jpg|png/;
-
   const extname = allowedTypes.test(
     path.extname(file.originalname).toLowerCase()
   );
