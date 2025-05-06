@@ -11,13 +11,13 @@ const createOrder = async (req) => {
 
   const existingOrder = await prisma.order.findUnique({
     where: {
-      userId: Number(userId),
+      id: Number(userId),
     },
   });
 
   if (existingOrder) {
     throw new BadRequestError(
-      `The user ${existingOrder.userId} has placed an order.`
+      `The user (${existingOrder.userId}) has placed an order (${existingOrder.code}).`
     );
   }
 
@@ -31,6 +31,32 @@ const createOrder = async (req) => {
     },
     include: { OrderItem: true },
   });
+
+  return result;
+};
+
+const getAllOrders = async () => {
+  console.log('TEST:');
+  const result = await prisma.order.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+    select: {
+      id: true,
+      code: true,
+      status: true,
+      userId: true,
+      createdAt: true,
+    },
+    // include: {
+    //   user: true,
+    //   OrderItem: true,
+    // },
+  });
+
+  if (!result || result.length === 0) {
+    throw new NotFoundError('There is no data available.');
+  }
 
   return result;
 };
@@ -51,5 +77,6 @@ const checkingOrders = async (id) => {
 
 module.exports = {
   createOrder,
+  getAllOrders,
   checkingOrders,
 };
