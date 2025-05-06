@@ -96,9 +96,24 @@ const deleteUser = async (req) => {
   return { msg: `User with Id ${id} deleted successfully` };
 };
 
+const checkingUsers = async (id) => {
+  const result = await prisma.user.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (!result) {
+    throw new NotFoundError(`User with id ${id} not found`);
+  }
+
+  return result;
+};
+
 module.exports = {
   getAllUsers,
   getOneUser,
   updateUser,
   deleteUser,
+  checkingUsers,
 };
