@@ -109,16 +109,37 @@ const getOneEvent = async (req) => {
   return formattedResult;
 };
 
-const deleteEvent = async (req) => {
+const updateEvent = async (req) => {
   const { id } = req.params;
+  const { name, description, status, location, price, quota } = req.body;
 
   const existing = await prisma.event.findUnique({
-    where: { id: Number(id) },
+    where: {
+      id: Number(id),
+    },
   });
 
   if (!existing) {
     throw new NotFoundError(`User with id ${id} not found`);
   }
+};
+
+const deleteEvent = async (req) => {
+  const { id } = req.params;
+
+  const existing = await prisma.event.findUnique({
+    where: { id: Number(id) },
+    select: {
+      id: true,
+      images: true,
+    },
+  });
+
+  if (!existing) {
+    throw new NotFoundError(`User with id ${id} not found`);
+  }
+
+  await deleteFile(existing.images[0], 'events');
 
   await prisma.event.delete({
     where: {
