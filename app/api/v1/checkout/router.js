@@ -1,22 +1,23 @@
 const express = require('express');
 const router = express();
-const { create, index } = require('./controller');
+const { checkout, destroy } = require('./controller');
 const {
   authenticateUser,
   authorizeRoles,
 } = require('../../../middlewares/auth');
 
 router.post(
-  '/create-order-items',
+  '/checkout',
   authenticateUser,
   authorizeRoles('superadmin', 'participant'),
-  create
+  checkout
 );
-router.get(
-  '/order-items',
+
+router.delete(
+  '/checkout/:id',
   authenticateUser,
-  authorizeRoles('superadmin'),
-  index
+  authorizeRoles('superadmin', 'participant'),
+  destroy
 );
 
 module.exports = router;

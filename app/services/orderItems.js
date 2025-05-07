@@ -32,6 +32,52 @@ const createOrderItem = async (req) => {
   };
 };
 
+const getAllOrderItems = async () => {
+  const result = await prisma.orderItem.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+    select: {
+      id: true,
+      order: {
+        select: {
+          id: true,
+          code: true,
+          status: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+      event: {
+        select: {
+          id: true,
+          name: true,
+          status: true,
+        },
+      },
+      quantity: true,
+      subtotal: true,
+      createdAt: true,
+    },
+  });
+
+  if (!result || result.length === 0) {
+    throw new NotFoundError('There is no data available.');
+  }
+
+  const formattedResult = result.map((item) => ({
+    ...item,
+    subtotal: Number(item.subtotal),
+  }));
+
+  return formattedResult;
+};
+
 module.exports = {
   createOrderItem,
+  getAllOrderItems,
 };

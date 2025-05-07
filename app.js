@@ -14,6 +14,7 @@ const usersRouter = require('./app/api/v1/users/router');
 const eventsRouter = require('./app/api/v1/events/router');
 const ordersRouter = require('./app/api/v1/orders/router');
 const orderItemsRouter = require('./app/api/v1/orderItems/router');
+const checkoutRouter = require('./app/api/v1/checkout/router');
 
 // middlewares
 const notFoundMiddleware = require('./app/middlewares/not-found');
@@ -42,6 +43,7 @@ app.use(`${v1}`, usersRouter);
 app.use(`${v1}`, eventsRouter);
 app.use(`${v1}`, ordersRouter);
 app.use(`${v1}`, orderItemsRouter);
+app.use(`${v1}`, checkoutRouter);
 
 // app middlewares
 app.use(notFoundMiddleware);

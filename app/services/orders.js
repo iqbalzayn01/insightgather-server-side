@@ -9,16 +9,18 @@ const createOrder = async (req) => {
     throw new BadRequestError('userId are required and must be valid.');
   }
 
-  const existingOrder = await prisma.order.findUnique({
+  const existingOrder = await prisma.orderItem.findFirst({
     where: {
-      id: Number(userId),
+      order: {
+        user: {
+          id: Number(userId),
+        },
+      },
     },
   });
 
   if (existingOrder) {
-    throw new BadRequestError(
-      `The user (${existingOrder.userId}) has placed an order (${existingOrder.code}).`
-    );
+    throw new BadRequestError(`You have placed an order for this event.`);
   }
 
   const orderCode = GenerateOrderCode();
@@ -28,6 +30,13 @@ const createOrder = async (req) => {
       code: orderCode,
       status,
       userId: Number(userId),
+    },
+    select: {
+      id: true,
+      code: true,
+      status: true,
+      userId: true,
+      createdAt: true,
     },
   });
 
@@ -148,7 +157,7 @@ const deleteOrder = async (req) => {
 
   await prisma.orderItem.deleteMany({
     where: {
-      id: Number(id),
+      orderId: Number(id),
     },
   });
 
