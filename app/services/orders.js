@@ -85,6 +85,76 @@ const getAllOrders = async () => {
 
 const getOneOrder = async (req) => {
   const { id } = req.params;
+
+  const result = await prisma.order.findUnique({
+    where: {
+      id: Number(id),
+    },
+    select: {
+      id: true,
+      code: true,
+      status: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      OrderItem: {
+        select: {
+          id: true,
+          orderId: true,
+          quantity: true,
+          subtotal: true,
+          event: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+            },
+          },
+        },
+      },
+      createdAt: true,
+    },
+  });
+
+  if (!result) {
+    throw new NotFoundError(`There is no order with id ${id}`);
+  }
+
+  const formattedResult = {
+    ...result,
+    OrderItem: result.OrderItem.map((item) => ({
+      ...item,
+      subtotal: Number(item.subtotal),
+    })),
+  };
+
+  return formattedResult;
+};
+
+const deleteOrder = async (req) => {
+  const { id } = req.params;
+  const existing = await prisma.order.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (!existing) {
+    throw new NotFoundError(`Order with id ${id} not found`);
+  }
+
+  await prisma.orderItem.deleteMany({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  await prisma.order.delete({ where: { id: Number(id) } });
+
+  return { msg: `Order with Id ${id} deleted successfully` };
 };
 
 const checkingOrders = async (id) => {
@@ -104,5 +174,7 @@ const checkingOrders = async (id) => {
 module.exports = {
   createOrder,
   getAllOrders,
+  getOneOrder,
+  deleteOrder,
   checkingOrders,
 };

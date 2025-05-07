@@ -1,4 +1,9 @@
-const { createOrder, getAllOrders } = require('../../../services/orders');
+const {
+  createOrder,
+  getAllOrders,
+  getOneOrder,
+  deleteOrder,
+} = require('../../../services/orders');
 const { status } = require('http-status');
 
 const create = async (req, res, next) => {
@@ -25,7 +30,33 @@ const index = async (req, res, next) => {
   }
 };
 
+const find = async (req, res, next) => {
+  try {
+    const result = await getOneOrder(req);
+
+    res.status(status.OK).json({
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const destroy = async (req, res, next) => {
+  try {
+    const result = await deleteOrder(req);
+
+    res.status(status.OK).json({
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   create,
   index,
+  find,
+  destroy,
 };

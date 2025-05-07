@@ -96,7 +96,7 @@ const getOneEvent = async (req) => {
   });
 
   if (!result) {
-    throw new NotFoundError(`There is no user with id ${id}`);
+    throw new NotFoundError(`There is no event with id ${id}`);
   }
 
   const formattedResult = {
