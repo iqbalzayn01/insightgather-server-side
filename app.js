@@ -23,7 +23,7 @@ const handlerErrorMiddleware = require('./app/middlewares/handle-error');
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://insightgathers.vercel.app/',
     credentials: true,
   })
 );
