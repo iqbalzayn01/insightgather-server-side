@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cors = require('cors');
 
 const app = express();
 
@@ -20,19 +21,17 @@ const checkoutRouter = require('./app/api/v1/checkout/router');
 const notFoundMiddleware = require('./app/middlewares/not-found');
 const handlerErrorMiddleware = require('./app/middlewares/handle-error');
 
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', (req, res) => {
-  res.status(200).json({
-    message: 'Welcome to API InsightGathers',
-  });
-});
-
-// app.get('/', (req, res) => res.send('Welcome to API InsightGathers'));
 
 // app router
 app.use(`${v1}`, authRouter);
@@ -42,6 +41,14 @@ app.use(`${v1}`, eventsRouter);
 app.use(`${v1}`, ordersRouter);
 app.use(`${v1}`, orderItemsRouter);
 app.use(`${v1}`, checkoutRouter);
+
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Welcome to API InsightGathers',
+  });
+});
+
+// app.get('/', (req, res) => res.send('Welcome to API InsightGathers'));
 
 // app middlewares
 app.use(notFoundMiddleware);
