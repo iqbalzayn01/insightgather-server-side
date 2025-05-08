@@ -49,7 +49,7 @@ app.use(`${v1}`, checkoutRouter);
 //   });
 // });
 
-app.get('/', (req, res) => res.send('Welcome to API InsightGathers'));
+app.get('/', (req, res) => res.send('Welcome to API InsightGathers.'));
 
 // app middlewares
 app.use(notFoundMiddleware);
