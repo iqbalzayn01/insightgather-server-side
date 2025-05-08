@@ -43,13 +43,11 @@ app.use(`${v1}`, ordersRouter);
 app.use(`${v1}`, orderItemsRouter);
 app.use(`${v1}`, checkoutRouter);
 
-// app.get('/', (req, res) => {
-//   res.status(200).json({
-//     message: 'Welcome to API InsightGathers',
-//   });
-// });
-
-app.get('/', (req, res) => res.send('Welcome to API InsightGathers.'));
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Welcome to API InsightGathers.',
+  });
+});
 
 // app middlewares
 app.use(notFoundMiddleware);
